@@ -124,66 +124,6 @@
   opacity: 0.8;
 }
 
-/* Search Bar */
-/* Search Bar Container */
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 15px;
-  padding: 9.6px 29.2px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  flex: 1;
-  max-width: 500px;
-  transition: all 0.3s ease;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-}
-
-/* Focus Effect */
-.search-bar:focus-within {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.02);
-}
-
-/* Input Field */
-.search-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #222;
-  width: 100%;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-/* Placeholder */
-.search-input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-/* Search Button */
-.search-button {
-  background: rgba(255, 255, 255, 0.4);
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-/* Hover Effect */
-.search-button:hover {
-  background: rgba(255, 255, 255, 0.6);
-  transform: scale(1.15);
-}
-
 /* Cart Button */
 .cart-button {
   position: relative;

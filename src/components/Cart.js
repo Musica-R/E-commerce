@@ -7,31 +7,6 @@ import Image from 'next/image';
 const Cart = () => {
     const { cartItems, isCartOpen, removeFromCart, updateQuantity, getCartTotal, toggleCart } = useCart();
 
-    // 🔹 Generate WhatsApp message
-    const generateWhatsAppMessage = () => {
-        let message = `*New Order Request*\n\n`;
-
-        cartItems.forEach((item, index) => {
-            message += `*${index + 1}. ${item.name}*\n`;
-            message += `Price: ₹${item.price}\n`;
-            message += `Quantity: ${item.quantity}\n`;
-            message += `Subtotal: ₹${item.price * item.quantity}\n`;
-        });
-
-        message += `----------------------\n`;
-        message += `*Total Amount:* ₹${getCartTotal()}\n\n`;
-        message += `Please confirm availability`;
-
-        return encodeURIComponent(message);
-    };
-
-    // 🔹 Open WhatsApp
-    const handleCheckout = () => {
-        const message = generateWhatsAppMessage();
-        const phoneNumber = "918610766168"; // your WhatsApp number
-        const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
-        window.open(whatsappURL, "_blank");
-    };
     return (
         <>
             {/* Overlay */}

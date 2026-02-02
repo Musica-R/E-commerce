@@ -59,15 +59,15 @@ export default function MainHero() {
             className="main-swiper"
           >
             <SwiperSlide className="main-slide">
-              <Image src={saree} alt="Silk Saree" fill priority />
+              <Image src={tissue} alt="Silk Saree" fill priority />
             </SwiperSlide>
 
             <SwiperSlide className="main-slide">
-              <Image src={tissue} alt="Tissue Saree" fill />
+              <Image src={poly} alt="Tissue Saree" fill />
             </SwiperSlide>
 
             <SwiperSlide className="main-slide">
-              <Image src={poly} alt="Poly Saree" fill />
+              <Image src={saree} alt="Poly Saree" fill />
             </SwiperSlide>
 
              <SwiperSlide className="main-slide">

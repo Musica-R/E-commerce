@@ -118,12 +118,12 @@
   z-index: 2;
 }
 
-.product-info {
+.product-infos {
   padding: 15px;
   text-align: center;
 }
 
-.product-info h3 {
+.product-infos h3 {
   font-size: 15px;
   font-weight: 500;
   margin-bottom: 6px;
@@ -180,7 +180,7 @@
     height: 320px;
   }
 
-  .product-info h3 {
+  .product-infos h3 {
     font-size: 14.5px;
   }
 
@@ -221,7 +221,7 @@
     height: 280px;
   }
 
-  .product-info {
+  .product-infos {
     padding: 14px;
   }
 
@@ -267,7 +267,7 @@
     font-size: 18px;
   }
 
-  .product-info h3 {
+  .product-infos h3 {
     font-size: 13px;
     line-height: 1.4;
   }

@@ -134,7 +134,7 @@ const HomeProduct = () => {
                             </div>
                         </div>
 
-                        <div className="product-info">
+                        <div className="product-infos">
                             <h3>{product.name}</h3>
                             <p className="price">{product.price}</p>
                         </div>
@@ -166,7 +166,7 @@ const HomeProduct = () => {
                                 </div>
                             </div>
                             {/* Info */}
-                            <div className="product-info">
+                            <div className="product-infos">
                                 <h3>{products.name}</h3>
                             </div>
                         </div>
@@ -197,7 +197,7 @@ const HomeProduct = () => {
                                 </div>
                             </div>
                             {/* Info */}
-                            <div className="product-info">
+                            <div className="product-infos">
                                 <h3>{products.name}</h3>
                                 <p className="price">{products.price}</p>
                             </div>

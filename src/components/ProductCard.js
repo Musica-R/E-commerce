@@ -18,21 +18,10 @@ const ProductCard = ({ product, onViewDetails }) => {
     return (
         <div className="product-card" id="product">
             {/* Product Image */}
-            <div className="product-image-container">
-                
-                <Image
-                    src={product.image}
-                    alt={product.name}
-                    className="product-image"
-                    width={0}
-                    height={0}
-                />
-
+            <div className="product-image-container">              
+                <Image src={product.image} alt={product.name} className="product-image"/>
                 <div className="product-overlay">
-                    <button
-                        className="view-details-btn"
-                        onClick={() => onViewDetails(product)}
-                    >
+                    <button className="view-details-btn" onClick={() => onViewDetails(product)}>
                         Quick View
                     </button>
                 </div>

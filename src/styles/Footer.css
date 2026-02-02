@@ -139,6 +139,10 @@
     .social-icon {
         font-size: 1.6rem;
     }
+
+    .footer-container {
+        margin: 0;
+    }
 }
 
 /* ===========================
@@ -148,16 +152,18 @@
 
     .footer {
         padding: 2rem 1rem 0.75rem;
-        text-align: center;
+        text-align: left;
     }
 
     .footer-container {
         grid-template-columns: 1fr;
         gap: 1.75rem;
+        justify-items: start;
+        align-items: start;
     }
 
     .footer-column {
-        align-items: center;
+        align-items: flex-start;
     }
 
     .footer-title {
@@ -173,7 +179,7 @@
     }
 
     .footer-links {
-        align-items: center;
+        align-items: flex-start;
     }
 
     .footer-links a:hover {
@@ -181,7 +187,7 @@
     }
 
     .social-links {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .social-icon {
@@ -192,4 +198,5 @@
         font-size: 0.8rem;
         padding-top: 1.5rem;
     }
+
 }
