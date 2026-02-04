@@ -6,8 +6,6 @@ import Image from "next/image";
 import "@/styles/Checkout.css";
 import Cart from "@/components/Cart";
 import MobileArrow from "@/components/MobileArrow";
-import LoginPopup from "@/components/Loginpage";
-import { auth } from "@/Auth/firebase";
 
 export default function Addtocart() {
     const { cartItems, getCartTotal } = useCart();
@@ -18,9 +16,6 @@ export default function Addtocart() {
         email: "",
         address: "",
     });
-
-    const [showLogin, setShowLogin] = useState(false);
-    const [pendingCheckout, setPendingCheckout] = useState(false);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -57,24 +52,6 @@ export default function Addtocart() {
         )}`;
 
         window.open(url, "_blank");
-    };
-
-   
-    const handleWhatsAppCheckout = () => {
-        if (cartItems.length === 0) {
-            alert("Your cart is empty");
-            return;
-        }
-
-        const user = auth.currentUser;
-
-        if (!user) {
-            setPendingCheckout(true);
-            setShowLogin(true);
-            return;
-        }
-
-        proceedToWhatsApp();
     };
 
     return (
@@ -121,7 +98,7 @@ export default function Addtocart() {
                         )}
                     </div>
 
-                  
+                    {/* 📝 Customer Details Form */}
                     <div className="checkout-form">
                         <h3>Customer Details</h3>
 
@@ -162,7 +139,7 @@ export default function Addtocart() {
 
                         <button
                             className="whatsapp-btn"
-                            onClick={handleWhatsAppCheckout}
+                            onClick={proceedToWhatsApp}
                             disabled={cartItems.length === 0}
                         >
                             Place Order on WhatsApp
@@ -170,19 +147,6 @@ export default function Addtocart() {
                     </div>
                 </div>
             </div>
-
-
-            <LoginPopup
-                isOpen={showLogin}
-                onClose={() => setShowLogin(false)}
-                onLoginSuccess={() => {
-                    setShowLogin(false);
-                    if (pendingCheckout) {
-                        proceedToWhatsApp();
-                        setPendingCheckout(false);
-                    }
-                }}
-            />
 
             <Cart />
             <MobileArrow />

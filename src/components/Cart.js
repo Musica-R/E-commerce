@@ -1,13 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/Cart.css";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import LoginPopup from "./Loginpage"; // adjust path if needed
+import { auth } from "@/Auth/firebase";
 
 const Cart = () => {
   const { cartItems, isCartOpen, removeFromCart, updateQuantity, getCartTotal, toggleCart } = useCart();
+  const router = useRouter();
+  const [showLogin, setShowLogin] = useState(false);
+
+  // Handle Checkout button click
+  const handleCheckout = () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      // If not logged in → show login popup
+      setShowLogin(true);
+      return;
+    }
+
+    // If logged in → navigate to /addtocart
+    router.push("/addtocart");
+    toggleCart(); // optionally close the cart sidebar
+  };
 
   return (
     <>
@@ -89,12 +109,23 @@ const Cart = () => {
               <span>Total:</span>
               <span className="total-amount">${getCartTotal().toFixed(2)}</span>
             </div>
-            <Link href="/addtocart">
-              <button className="checkout-btn">Proceed to Checkout</button>
-            </Link>
+            <button className="checkout-btn" onClick={handleCheckout}>
+              Proceed to Checkout
+            </button>
           </div>
         )}
       </div>
+
+      {/* Login Popup */}
+      <LoginPopup
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        onLoginSuccess={() => {
+          setShowLogin(false);
+          router.push("/addtocart"); // navigate after successful login
+          toggleCart(); // optionally close cart sidebar
+        }}
+      />
     </>
   );
 };

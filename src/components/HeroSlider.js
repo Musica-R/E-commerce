@@ -6,10 +6,10 @@ import { Autoplay } from "swiper/modules";
 
 import "swiper/css";
 
-import hero1 from "@/assets/banner5.webp";
-import hero2 from "@/assets/banner6.webp";
-import hero3 from "@/assets/banner8.webp";
-import hero4 from "@/assets/banner8webp.webp";
+import hero1 from "@/assets/Gold and Burgundy Modern Elegant Sarees Sale Billboard (Landscape).png";
+import hero2 from "@/assets/Red and Green Illustrated Sarees Sale Facebook Ad.png";
+import hero3 from "@/assets/Red and Green Simple Elegant Sarees Republic Day Sale Billboard.png";
+import hero4 from "@/assets/Red and White Simple Traditional Republic Day Special Sale Billboard (Landscape).png";
 
 export default function HeroSection() {
   return (

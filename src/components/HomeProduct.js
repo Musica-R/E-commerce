@@ -82,7 +82,7 @@ const HomeProduct = () => {
         ) : hotLoom.length > 0 ? (
           hotLoom.map((product) => (
             <div key={product._id} className="homeproduct-card">
-              <span className="wishlist">♡</span>
+              {/* <span className="wishlist">♡</span> */}
 
               <div className="image-wrap">
                 <Image
@@ -124,7 +124,7 @@ const HomeProduct = () => {
         <div className="homeproduct-grid">
           {productss.map((item) => (
             <div key={item.id} className="homeproduct-card card-border">
-              <span className="wishlist">♡</span>
+              {/* <span className="wishlist">♡</span> */}
 
               <div className="image-wrap">
                 <Image
@@ -164,7 +164,7 @@ const HomeProduct = () => {
           {products.map((item) => (
             <div key={item.id} className="homeproduct-card">
               {item.isNew && <span className="badge-new">NEW</span>}
-              <span className="wishlist">♡</span>
+              {/* <span className="wishlist">♡</span> */}
 
               <div className="image-wrap">
                 <Image
