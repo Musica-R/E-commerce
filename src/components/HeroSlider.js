@@ -26,15 +26,15 @@ export default function HeroSection() {
           }}
         >
           <SwiperSlide>
-            <Image src={hero2} alt="Offer 2" className="offer-banner-img" />
+            <Image src={hero3} alt="Offer 2" className="offer-banner-img" />
           </SwiperSlide>
 
           <SwiperSlide>
-            <Image src={hero3} alt="Offer 3" className="offer-banner-img" />
+            <Image src={hero1} alt="Offer 3" className="offer-banner-img" />
           </SwiperSlide>
 
           <SwiperSlide>
-            <Image src={hero1} alt="Offer 1" className="offer-banner-img" />
+            <Image src={hero2} alt="Offer 1" className="offer-banner-img" />
           </SwiperSlide>
 
           <SwiperSlide>
