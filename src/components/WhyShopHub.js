@@ -48,6 +48,7 @@ export default function WhyShopHub() {
                     ))}
                 </div>
             </div>
+            
         </section>
     );
 }

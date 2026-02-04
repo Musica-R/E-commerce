@@ -1,92 +1,204 @@
 "use client";
 
 import React, { useState } from "react";
+import axios from "axios";
 import "../styles/LoginPopup.css";
-import Image from 'next/image';
-import login from "../assets/Login.png"
-import { useRef } from "react";
-import Lottie from "lottie-react";
-import otpAnimation from "../Lottie/Pass.json";
+import { auth } from "../Auth/firebase";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import Image from "next/image";
+import loginImg from "../assets/Login.png";
+import signupImg from "../assets/signin.png";
 
-const LoginPopup = ({ isOpen, onClose }) => {
-    const [mobile, setMobile] = useState("");
-    const [otpSent, setOtpSent] = useState(false);
+const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
+  const [isSignup, setIsSignup] = useState(false);
 
-    //otp verification box modal 
-    const [otp, setOtp] = useState(["", "", "", ""]);
-    const inputRefs = useRef([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleOtpChange = (value, index) => {
-        if (!/^[0-9]?$/.test(value)) return;
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
 
-        const newOtp = [...otp];
-        newOtp[index] = value;
-        setOtp(newOtp);
+  if (!isOpen) return null;
 
-        if (value && index < 3) {
-            inputRefs.current[index + 1]?.focus();
+  // 🔐 LOGIN
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const userCred = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await auth.currentUser.reload();
+
+      if (!userCred.user.emailVerified) {
+        alert("Please verify your email before login");
+        return;
+      }
+
+      const token = await userCred.user.getIdToken();
+
+      await axios.post(
+        "/api/login", // ✅ IMPORTANT
+        {
+          email: userCred.user.email,
+          emailVerified: true,
+        },
+        {
+          headers: {
+            Authorization: token, // backend expects RAW token
+          },
         }
-    };
+      );
 
-    const handleOtpKeyDown = (e, index) => {
-        if (e.key === "Backspace" && !otp[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+      alert("Login successful 🎉");
+      onLoginSuccess?.();
+      onClose();
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
+  // 📝 SIGNUP
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      alert("Enter valid 10 digit mobile number");
+      return;
+    }
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await sendEmailVerification(userCred.user);
+
+      const token = await userCred.user.getIdToken();
+
+      await axios.post(
+        "/api/register", // ✅ IMPORTANT
+        {
+          name,
+          email,
+          phonenumber: mobile,
+          uid: userCred.user.uid,
+          emailverified: false,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
         }
-    };
+      );
 
-    if (!isOpen) return null;
+      alert("Registered successfully! Verify your email 📩");
 
-    return (
-        <div className="login-overlay" onClick={onClose}>
-            <div className="login-popup" onClick={(e) => e.stopPropagation()}>
+      setIsSignup(false);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setMobile("");
+    } catch (err) {
+      console.error("REGISTER ERROR:", err);
+      alert(err.response?.data?.message || err.message);
+    }
+  };
 
-                {!otpSent ? (
-                    <>
-                        <div className="loginwrap">
-                            <Image src={login} alt="offer" className="Login-img" width={300} height={180} />
-                            <h3>Login</h3>
+  return (
+    <div className="login-overlay" onClick={onClose}>
+      <div className="login-popup" onClick={(e) => e.stopPropagation()}>
+        <span className="close-btn" onClick={onClose}>✕</span>
 
-                            <input type="number" placeholder="Enter mobile number" maxLength="10" value={mobile} onChange={(e) => setMobile(e.target.value)} />
-                            <button onClick={() => mobile.length === 10 && setOtpSent(true)}> Send OTP </button>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className="loginwrap center">
+        {isSignup ? (
+          <form onSubmit={handleSignup} className="login-form">
+            <Image src={signupImg} alt="signup" width={300} height={200}  className="Login-img" />
 
-                            {/* Lottie Animation */}
-                            <div className="otp-lottie">
-                                <Lottie
-                                    animationData={otpAnimation}
-                                    loop
-                                    style={{ width: 180, height: 180 }}
-                                />
-                            </div>
+            <h3>Create Account</h3>
 
-                            <h3>Verify With OTP</h3>
-                            <div className="otp-container">
-                                {otp.map((digit, index) => (
-                                    <input
-                                        key={index}
-                                        ref={(el) => (inputRefs.current[index] = el)}
-                                        type="text"
-                                        maxLength="1"
-                                        inputMode="numeric"
-                                        value={digit}
-                                        onChange={(e) => handleOtpChange(e.target.value, index)}
-                                        onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                                        className="otp-input"
-                                    />
-                                ))}
-                            </div>
-                            <button>Verify OTP</button>
-                        </div>
-                    </>
-                )}
-                <span className="close-btn" onClick={onClose}>✕</span>
-            </div>
-        </div>
-    );
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+
+            <input
+              type="tel"
+              placeholder="Mobile Number"
+              maxLength={10}
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
+              required
+            />
+
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <button type="submit">Sign Up</button>
+
+            <p className="toggle-text">
+              Already have an account?{" "}
+              <span onClick={() => setIsSignup(false)} className="color">Login</span>
+            </p>
+          </form>
+        ) : (
+          <form onSubmit={handleLogin} className="login-form">
+            <Image src={loginImg} alt="login" width={300} height={180}  className="Login-img"/>
+
+            <h3>Login</h3>
+
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <button type="submit">Login</button>
+
+            <p className="toggle-text">
+              Don&apos;t have an account?{" "}
+              <span onClick={() => setIsSignup(true)} className="color">Sign Up</span>
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default LoginPopup;

@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
-import { useCart } from '../context/CartContext';
-import '../styles/ProductModal.css';
-import Image from 'next/image';
+"use client";
 
-// ProductModal Component
-// Displays detailed product information in a modal dialog
+import React, { useState } from "react";
+import { useCart } from "../context/CartContext";
+import "../styles/ProductModal.css";
+import Image from "next/image";
+
 const ProductModal = ({ product, onClose }) => {
     const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
 
+    const rating = 4;
+
     if (!product) return null;
 
-    // Handle add to cart from modal
     const handleAddToCart = () => {
         addToCart(product, quantity);
         onClose();
+        // alert("✅ Product successfully added to your cart!");
     };
 
     return (
@@ -28,15 +30,14 @@ const ProductModal = ({ product, onClose }) => {
                 <div className="modal-body">
                     {/* Product Image */}
                     <div className="modal-image-container">
-
                         <Image
                             src={product.image}
                             alt={product.name}
                             className="modal-image"
-                            width={0}
-                            height={0}
+                            width={400}
+                            height={400}
+                            style={{ objectFit: "contain" }}
                         />
-
                     </div>
 
                     {/* Product Details */}
@@ -49,16 +50,13 @@ const ProductModal = ({ product, onClose }) => {
                             {[...Array(5)].map((_, index) => (
                                 <span
                                     key={index}
-                                    className={index < Math.floor(product.rating) ? 'star filled' : 'star'}
-                                >
-                                    ⭐
-                                </span>
+                                    className={index < Math.floor(product.rating) ? "star filled" : "star"}> ⭐ </span>
                             ))}
-                            <span className="rating-number">({product.rating})</span>
+                            <span className="rating-number">({rating}.0)</span>
                         </div>
 
                         {/* Description */}
-                        <p className="modal-description">{product.description}</p>
+                        <p className="modal-description">{product.desc}</p>
 
                         {/* Price */}
                         <div className="modal-price">${product.price.toFixed(2)}</div>
@@ -74,10 +72,7 @@ const ProductModal = ({ product, onClose }) => {
                                     -
                                 </button>
                                 <span className="qty-value">{quantity}</span>
-                                <button
-                                    className="qty-btn"
-                                    onClick={() => setQuantity(quantity + 1)}
-                                >
+                                <button className="qty-btn" onClick={() => setQuantity(quantity + 1)}>
                                     +
                                 </button>
                             </div>

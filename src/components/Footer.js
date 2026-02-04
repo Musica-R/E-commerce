@@ -2,8 +2,7 @@ import React from 'react';
 import '../styles/Footer.css';
 import { FaLinkedinIn, FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
 
-// Footer Component
-// Displays site footer with links and information
+
 const Footer = () => {
     return (
         <footer className="footer">

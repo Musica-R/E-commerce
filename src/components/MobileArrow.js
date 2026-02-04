@@ -31,6 +31,7 @@ export default function MobileArrow() {
       )}
 
       {/* CSS INSIDE JSX */}
+      
       <style jsx>{`
         .scroll-top-arrow {
           position: fixed;
