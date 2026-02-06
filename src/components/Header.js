@@ -66,7 +66,7 @@ const Header = () => {
 
             {/* Profile */}
             <div className="profile pro" onClick={handleProfileClick}>
-              <CgProfile size={22} />
+              <CgProfile size={32} />
 
               {dropdownOpen && (
                 <div className="profile-dropdown">

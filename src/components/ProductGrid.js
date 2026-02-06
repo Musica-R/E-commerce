@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { useSearch } from "../context/SearchContext";
 import "../styles/ProductGrid.css";
+import Loader from "./Loader";
 
 const ProductGrid = ({ onViewDetails }) => {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -28,10 +29,8 @@ const ProductGrid = ({ onViewDetails }) => {
 
         const data = await res.json();
 
-        // ✅ Your API returns an ARRAY
-        const activeProducts = Array.isArray(data)
-          ? data.filter((item) => item.status === "active")
-          : [];
+        //API returns an ARRAY
+        const activeProducts = Array.isArray(data) ? data.filter((item) => item.status === "active") : [];
 
         setProducts(activeProducts);
       } catch (err) {
@@ -70,7 +69,7 @@ const ProductGrid = ({ onViewDetails }) => {
 
   // 🔄 Loading UI
   if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading products...</p>;
+    return <Loader className="loader"/>
   }
 
   // ❌ Error UI
@@ -119,7 +118,7 @@ const ProductGrid = ({ onViewDetails }) => {
         </div>
 
         {/* Product Grid */}
-        <div className="product-grid">
+        <div className={`product-grid ${!loading ? "show" : ""}`}>
           {filteredProducts.map((product) => (
             <ProductCard
               key={product._id}

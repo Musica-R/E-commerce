@@ -6,9 +6,13 @@ import Image from "next/image";
 import "@/styles/Checkout.css";
 import Cart from "@/components/Cart";
 import MobileArrow from "@/components/MobileArrow";
+import PaymentButton from "@/components/PaymentButton";
 
 export default function Addtocart() {
     const { cartItems, getCartTotal } = useCart();
+
+    const [paymentMethod, setPaymentMethod] = useState("COD");
+    const [paidOrder, setPaidOrder] = useState(null);
 
     const [form, setForm] = useState({
         name: "",
@@ -20,25 +24,18 @@ export default function Addtocart() {
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
+ 
+    const placeCODOrder = () => {
+        let message = `*NEW COD ORDER*\n\n`;
 
-    // 🔹 FINAL WhatsApp redirect
-    const proceedToWhatsApp = () => {
-        if (cartItems.length === 0) {
-            alert("Your cart is empty");
-            return;
-        }
-
-        let message = `*New Order Request*\n\n`;
-
-        cartItems.forEach((item, index) => {
-            message += `*${index + 1}. ${item.name}*\n`;
-            message += `Price: ₹${item.price}\n`;
-            message += `Qty: ${item.quantity}\n`;
-            message += `Subtotal: ₹${item.price * item.quantity}\n\n`;
+        cartItems.forEach((item, i) => {
+            message += `*${i + 1}. ${item.name}*\n`;
+            message += `₹${item.price} × ${item.quantity}\n\n`;
         });
 
         message += `----------------------\n`;
-        message += `*Total:* ₹${getCartTotal()}\n\n`;
+        message += `*Total:* ₹${getCartTotal()}\n`;
+        message += `*Payment:* Cash on Delivery\n\n`;
 
         message += `*Customer Details*\n`;
         message += `Name: ${form.name}\n`;
@@ -46,12 +43,46 @@ export default function Addtocart() {
         message += `Email: ${form.email}\n`;
         message += `Address: ${form.address}\n`;
 
-        const phoneNumber = "918610766168";
-        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-            message
-        )}`;
+        window.open(
+            `https://wa.me/918610766168?text=${encodeURIComponent(message)}`,
+            "_blank"
+        );
+    };
 
-        window.open(url, "_blank");
+    
+    const paymentSuccess = (payment) => {
+        setPaidOrder(payment); 
+    };
+
+   
+    const sendPaidOrderToWhatsApp = () => {
+        if (!paidOrder) return;
+
+        let message = `*PAID ORDER RECEIVED*\n\n`;
+
+        message += `*Payment ID:* ${paidOrder.razorpay_payment_id}\n`;
+        message += `*Order ID:* ${paidOrder.razorpay_order_id}\n`;
+        message += `*Amount Paid:* ₹${paidOrder.amountPaid}\n\n`;
+
+
+        cartItems.forEach((item, i) => {
+            message += `*${i + 1}. ${item.name}*\n`;
+            message += `₹${item.price} × ${item.quantity}\n\n`;
+        });
+
+        message += `----------------------\n`;
+        message += `*Payment Mode:* Online (Razorpay)\n\n`;
+
+        message += `*Customer Details*\n`;
+        message += `Name: ${form.name}\n`;
+        message += `Phone: ${form.phone}\n`;
+        message += `Email: ${form.email}\n`;
+        message += `Address: ${form.address}\n`;
+
+        window.open(
+            `https://wa.me/918610766168?text=${encodeURIComponent(message)}`,
+            "_blank"
+        );
     };
 
     return (
@@ -60,90 +91,60 @@ export default function Addtocart() {
                 <h2 className="checkout-title">Checkout</h2>
 
                 <div className="checkout-grid">
-                    {/* 🛒 Cart Items */}
+                    {/* CART */}
                     <div className="checkout-cart">
-                        <h3>Your Order</h3>
-
-                        {cartItems.length === 0 ? (
-                            <p>Your cart is empty</p>
-                        ) : (
-                            cartItems.map((item) => (
-                                <div className="checkout-item" key={item._id}>
-                                    <Image
-                                        src={item.image}
-                                        alt={item.name}
-                                        width={80}
-                                        height={100}
-                                        className="checkout-image"
-                                    />
-
-                                    <div className="checkout-item-info">
-                                        <p className="item-name">{item.name}</p>
-                                        <p>
-                                            ₹{item.price} × {item.quantity}
-                                        </p>
-                                    </div>
-
-                                    <span className="item-subtotal">
-                                        ₹{item.price * item.quantity}
-                                    </span>
+                        {cartItems.map((item) => (
+                            <div className="checkout-item" key={item._id}>
+                                <Image src={item.image} alt={item.name} width={80} height={100} />
+                                <div>
+                                    <p>{item.name}</p>
+                                    <p>₹{item.price} × {item.quantity}</p>
                                 </div>
-                            ))
-                        )}
-
-                        {cartItems.length > 0 && (
-                            <div className="checkout-total">
-                                Total: ₹{getCartTotal()}
                             </div>
-                        )}
+                        ))}
+                        <h3>Total: ₹{getCartTotal()}</h3>
                     </div>
 
-                    {/* 📝 Customer Details Form */}
+                    {/* FORM */}
                     <div className="checkout-form">
-                        <h3>Customer Details</h3>
+                        <input name="name" placeholder="Name" onChange={handleChange} />
+                        <input name="phone" placeholder="Phone" onChange={handleChange} />
+                        <input name="email" placeholder="Email" onChange={handleChange} />
+                        <textarea name="address" placeholder="Address" onChange={handleChange} />
 
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Full Name"
-                            value={form.name}
-                            onChange={handleChange}
-                            required
-                        />
+                        <h4>Payment Method</h4>
+                        <label>
+                            <input type="radio" checked={paymentMethod === "COD"}
+                                onChange={() => { setPaymentMethod("COD"); setPaidOrder(null);}}
+                                style={{ position: "relative", top: "30px" }}/>
+                            Cash on Delivery
+                        </label>
 
-                        <input
-                            type="number"
-                            name="phone"
-                            placeholder="Phone Number"
-                            value={form.phone}
-                            onChange={handleChange}
-                            required
-                        />
+                        <label>
+                            <input type="radio" checked={paymentMethod === "ONLINE"}
+                                onChange={() => setPaymentMethod("ONLINE")}
+                                style={{ position: "relative", top: "30px" }}/>
+                            Online Payment
+                        </label>
 
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email Address"
-                            value={form.email}
-                            onChange={handleChange}
-                        />
+                        {/* BUTTONS */}
+                        {paymentMethod === "COD" && (
+                            <button className="whatsapp-btn" onClick={placeCODOrder} style={{ marginTop: "30px" }} >
+                                Place COD Order
+                            </button>
+                        )}
 
-                        <textarea
-                            name="address"
-                            placeholder="Delivery Address"
-                            rows="4"
-                            value={form.address}
-                            onChange={handleChange}
-                            required
-                        ></textarea>
+                        {paymentMethod === "ONLINE" && !paidOrder && (
+                            <PaymentButton amount={getCartTotal()} onSuccess={paymentSuccess}  customer={form}/>
+                        )}
 
-                        <button
-                            className="whatsapp-btn"
-                            onClick={proceedToWhatsApp}
-                            disabled={cartItems.length === 0}
-                        >
-                            Place Order on WhatsApp
-                        </button>
+                        {paymentMethod === "ONLINE" && paidOrder && (
+                            <button className="whatsapp-btn" style={{ backgroundColor: "green" ,marginTop: "30px"  }}
+                                onClick={sendPaidOrderToWhatsApp}>
+                                Send Paid Order on WhatsApp
+                            </button>
+                        )}
+
                     </div>
                 </div>
             </div>

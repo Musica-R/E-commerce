@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -9,6 +10,7 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { handleLoginError, handleRegisterError } from "../Lottie/helper";
 import Image from "next/image";
 import loginImg from "../assets/Login.png";
 import signupImg from "../assets/signin.png";
@@ -24,7 +26,7 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
 
   if (!isOpen) return null;
 
-  // 🔐 LOGIN
+  // 🔐 LOGIN with helper
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -37,42 +39,44 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
 
       await auth.currentUser.reload();
 
-      if (!userCred.user.emailVerified) {
-        alert("Please verify your email before login");
-        return;
+      if (!auth.currentUser.emailVerified) {
+        return alert("Please verify your email before login");
       }
 
       const token = await userCred.user.getIdToken();
 
       await axios.post(
-        "/api/login", // ✅ IMPORTANT
+        "/api/login",
         {
+          uid: userCred.user.uid,
           email: userCred.user.email,
           emailVerified: true,
         },
         {
-          headers: {
-            Authorization: token, // backend expects RAW token
-          },
+          headers: { Authorization: token },
         }
       );
+
+      // if (data.data.datas[0].admin === "CUSTOMER") {
+      //   alert("Login successful 🎉");
+      //   onLoginSuccess?.();
+      //   onClose();
+      // }
 
       alert("Login successful 🎉");
       onLoginSuccess?.();
       onClose();
-    } catch (err) {
-      console.error("LOGIN ERROR:", err);
-      alert(err.response?.data?.message || err.message);
+    } catch (error) {
+      alert(handleLoginError(error));
     }
   };
 
-  // 📝 SIGNUP
+  // 📝 SIGNUP with helper
   const handleSignup = async (e) => {
     e.preventDefault();
 
     if (!/^[6-9]\d{9}$/.test(mobile)) {
-      alert("Enter valid 10 digit mobile number");
-      return;
+      return alert("Enter a valid 10-digit mobile number");
     }
 
     try {
@@ -87,31 +91,24 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
       const token = await userCred.user.getIdToken();
 
       await axios.post(
-        "/api/register", // ✅ IMPORTANT
+        "/api/register",
         {
           name,
           email,
           phonenumber: mobile,
           uid: userCred.user.uid,
           emailverified: false,
+          admins: "CUSTOMER"
         },
         {
-          headers: {
-            Authorization: token,
-          },
+          headers: { Authorization: token },
         }
       );
 
       alert("Registered successfully! Verify your email 📩");
-
       setIsSignup(false);
-      setName("");
-      setEmail("");
-      setPassword("");
-      setMobile("");
-    } catch (err) {
-      console.error("REGISTER ERROR:", err);
-      alert(err.response?.data?.message || err.message);
+    } catch (error) {
+      alert(handleRegisterError(error));
     }
   };
 
@@ -122,77 +119,50 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
 
         {isSignup ? (
           <form onSubmit={handleSignup} className="login-form">
-            <Image src={signupImg} alt="signup" width={300} height={200}  className="Login-img" />
-
+            <Image src={signupImg} alt="signup" width={300} height={200} className="Login-img" />
             <h3>Create Account</h3>
 
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <input type="text" placeholder="Full Name" value={name}
+              onChange={(e) => setName(e.target.value)} required />
 
-            <input
-              type="tel"
-              placeholder="Mobile Number"
-              maxLength={10}
+            <input type="tel" placeholder="Mobile Number" maxLength={10}
               value={mobile}
               onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
-              required
-            />
+              required />
 
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input type="email" placeholder="Email Address" value={email}
+              onChange={(e) => setEmail(e.target.value)} required />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input type="password" placeholder="Password" value={password}
+              onChange={(e) => setPassword(e.target.value)} required />
 
             <button type="submit">Sign Up</button>
 
             <p className="toggle-text">
-              Already have an account?{" "}
-              <span onClick={() => setIsSignup(false)} className="color">Login</span>
+              Already have an account?
+              <span onClick={() => setIsSignup(false)} className="color">
+                Login
+              </span>
             </p>
           </form>
         ) : (
           <form onSubmit={handleLogin} className="login-form">
-            <Image src={loginImg} alt="login" width={300} height={180}  className="Login-img"/>
-
+            <Image src={loginImg} alt="login" width={300} height={180} className="Login-img" />
             <h3>Login</h3>
 
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input type="email" placeholder="Email Address" value={email}
+              onChange={(e) => setEmail(e.target.value)} required />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input type="password" placeholder="Password" value={password}
+              onChange={(e) => setPassword(e.target.value)} required />
 
             <button type="submit">Login</button>
 
             <p className="toggle-text">
-              Don&apos;t have an account?{" "}
-              <span onClick={() => setIsSignup(true)} className="color">Sign Up</span>
+              Don&apos;t have an account?
+              <span onClick={() => setIsSignup(true)} className="color">
+                Sign Up
+              </span>
             </p>
           </form>
         )}
