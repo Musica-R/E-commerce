@@ -24,7 +24,20 @@ export default function Addtocart() {
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
- 
+
+    const resetCheckout = () => {
+        setForm({
+            name: "",
+            phone: "",
+            email: "",
+            address: "",
+        });
+
+        setPaymentMethod("COD");
+        setPaidOrder(null);
+    };
+
+
     const placeCODOrder = () => {
         let message = `*NEW COD ORDER*\n\n`;
 
@@ -47,14 +60,16 @@ export default function Addtocart() {
             `https://wa.me/918610766168?text=${encodeURIComponent(message)}`,
             "_blank"
         );
+
+        resetCheckout();
     };
 
-    
+
     const paymentSuccess = (payment) => {
-        setPaidOrder(payment); 
+        setPaidOrder(payment);
     };
 
-   
+
     const sendPaidOrderToWhatsApp = () => {
         if (!paidOrder) return;
 
@@ -83,6 +98,8 @@ export default function Addtocart() {
             `https://wa.me/918610766168?text=${encodeURIComponent(message)}`,
             "_blank"
         );
+
+        resetCheckout();
     };
 
     return (
@@ -107,23 +124,24 @@ export default function Addtocart() {
 
                     {/* FORM */}
                     <div className="checkout-form">
-                        <input name="name" placeholder="Name" onChange={handleChange} />
-                        <input name="phone" placeholder="Phone" onChange={handleChange} />
-                        <input name="email" placeholder="Email" onChange={handleChange} />
-                        <textarea name="address" placeholder="Address" onChange={handleChange} />
+                        <input name="name" value={form.name} placeholder="Name" onChange={handleChange} />
+                        <input name="phone" value={form.phone} placeholder="Phone" onChange={handleChange} />
+                        <input name="email" value={form.email} placeholder="Email" onChange={handleChange} />
+                        <textarea name="address" value={form.address} placeholder="Address" onChange={handleChange} />
+
 
                         <h4>Payment Method</h4>
                         <label>
                             <input type="radio" checked={paymentMethod === "COD"}
-                                onChange={() => { setPaymentMethod("COD"); setPaidOrder(null);}}
-                                style={{ position: "relative", top: "30px" }}/>
+                                onChange={() => { setPaymentMethod("COD"); setPaidOrder(null); }}
+                                style={{ position: "relative", top: "30px" }} />
                             Cash on Delivery
                         </label>
 
                         <label>
                             <input type="radio" checked={paymentMethod === "ONLINE"}
                                 onChange={() => setPaymentMethod("ONLINE")}
-                                style={{ position: "relative", top: "30px" }}/>
+                                style={{ position: "relative", top: "30px" }} />
                             Online Payment
                         </label>
 
@@ -135,11 +153,11 @@ export default function Addtocart() {
                         )}
 
                         {paymentMethod === "ONLINE" && !paidOrder && (
-                            <PaymentButton amount={getCartTotal()} onSuccess={paymentSuccess}  customer={form}/>
+                            <PaymentButton amount={getCartTotal()} onSuccess={paymentSuccess} customer={form} />
                         )}
 
                         {paymentMethod === "ONLINE" && paidOrder && (
-                            <button className="whatsapp-btn" style={{ backgroundColor: "green" ,marginTop: "30px"  }}
+                            <button className="whatsapp-btn" style={{ backgroundColor: "green", marginTop: "30px" }}
                                 onClick={sendPaidOrderToWhatsApp}>
                                 Send Paid Order on WhatsApp
                             </button>

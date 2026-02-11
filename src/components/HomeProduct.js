@@ -67,9 +67,9 @@ const HomeProduct = () => {
   }, []);
 
   return (
-    <section className="homeproduct-section">
+    <section className="homeproduct-section" id="offers">
       {/* Hot of the Loom */}
-      <div className="homeproduct-header" id="offers">
+      <div className="homeproduct-header" >
         <h2>Hot of the Loom</h2>
         <Link href="/product" className="view-all">
           View All →

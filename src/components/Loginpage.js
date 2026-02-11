@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -9,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { handleLoginError, handleRegisterError } from "../Lottie/helper";
 import Image from "next/image";
@@ -26,20 +26,24 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
 
   if (!isOpen) return null;
 
-  // 🔐 LOGIN with helper
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+    setName("");
+    setMobile("");
+  };
+
+  /* ---------------- LOGIN ---------------- */
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const userCred = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
 
       await auth.currentUser.reload();
 
       if (!auth.currentUser.emailVerified) {
+        await signOut(auth);
         return alert("Please verify your email before login");
       }
 
@@ -57,12 +61,6 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
         }
       );
 
-      // if (data.data.datas[0].admin === "CUSTOMER") {
-      //   alert("Login successful 🎉");
-      //   onLoginSuccess?.();
-      //   onClose();
-      // }
-
       alert("Login successful 🎉");
       onLoginSuccess?.();
       onClose();
@@ -71,7 +69,7 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
     }
   };
 
-  // 📝 SIGNUP with helper
+  /* ---------------- SIGNUP ---------------- */
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -79,12 +77,10 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
       return alert("Enter a valid 10-digit mobile number");
     }
 
+    let userCred = null;
+
     try {
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      userCred = await createUserWithEmailAndPassword(auth, email, password);
 
       await sendEmailVerification(userCred.user);
 
@@ -98,17 +94,37 @@ const LoginPopup = ({ isOpen, onClose, onLoginSuccess }) => {
           phonenumber: mobile,
           uid: userCred.user.uid,
           emailverified: false,
-          admins: "CUSTOMER"
+          admins: "CUSTOMER",
         },
         {
           headers: { Authorization: token },
         }
       );
 
-      alert("Registered successfully! Verify your email 📩");
+      /* logout after signup (important) */
+      await signOut(auth);
+
+      alert("Registered successfully! Verify your email and login 📩");
       setIsSignup(false);
+
     } catch (error) {
+      /* if backend register fails, delete firebase user */
+      if (userCred?.user) {
+        await userCred.user.delete().catch(() => { });
+      }
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          alert("This mobile number is already registered. Try using a different mobile number");
+          resetForm();
+          return;
+        }
+        alert("Registration failed. Please try again.");
+        return;
+      }
+
       alert(handleRegisterError(error));
+      resetForm();
     }
   };
 
